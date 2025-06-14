@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星际通缉令 - 极恶K</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0A192F',
+                        secondary: '#64FFDA',
+                        accent: '#FF2E63',
+                        dark: '#121212',
+                        light: '#E2E8F0',
+                        warning: '#FFD166',
+                        danger: '#EF476F',
+                        info: '#118AB2',
+                        success: '#06D6A0',
+                        metallic: {
+                            100: '#F0F4F8',
+                            200: '#D9E2EC',
+                            300: '#BCCCDC',
+                            400: '#9FB3C8',
+                            500: '#829AB1',
+                            600: '#627D98',
+                            700: '#486581',
+                            800: '#334E68',
+                            900: '#243B53'
+                        }
+                    },
+                    fontFamily: {
+                        song: ['"Noto Serif SC"', 'serif'],
+                    },
+                    boxShadow: {
+                        'neon': '0 0 5px #64FFDA, 0 0 10px #64FFDA, 0 0 15px #64FFDA',
+                        'neon-red': '0 0 5px #FF2E63, 0 0 10px #FF2E63, 0 0 15px #FF2E63',
+                        'inner-neon': 'inset 0 0 5px #64FFDA, inset 0 0 10px #64FFDA'
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 0 5px #64FFDA;
+            }
+            .text-shadow-red {
+                text-shadow: 0 0 5px #FF2E63;
+            }
+            .grid-matrix {
+                background-image: linear-gradient(#0A192F 1px, transparent 1px),
+                                  linear-gradient(to right, #0A192F 1px, transparent 1px);
+                background-size: 20px 20px;
+            }
+            .animate-glow {
+                animation: glow 2s ease-in-out infinite alternate;
+            }
+            .animate-pulse-slow {
+                animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            }
+            .animate-float {
+                animation: float 6s ease-in-out infinite;
+            }
+            .animate-scan {
+                animation: scan 3s linear infinite;
+            }
+            .animate-shine {
+                position: relative;
+                overflow: hidden;
+            }
+            .animate-shine::after {
+                content: '';
+                position: absolute;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%);
+                transform: rotate(30deg);
+                animation: shine 3s infinite;
+            }
+            @keyframes glow {
+                from {
+                    box-shadow: 0 0 5px rgba(100, 255, 218, 0.5), 0 0 10px rgba(100, 255, 218, 0.3);
+                }
+                to {
+                    box-shadow: 0 0 10px rgba(100, 255, 218, 0.8), 0 0 20px rgba(100, 255, 218, 0.5), 0 0 30px rgba(100, 255, 218, 0.3);
+                }
+            }
+            @keyframes float {
+                0% {
+                    transform: translateY(0px);
+                }
+                50% {
+                    transform: translateY(-10px);
+                }
+                100% {
+                    transform: translateY(0px);
+                }
+            }
+            @keyframes scan {
+                0% {
+                    background-position: 0 -100%;
+                }
+                100% {
+                    background-position: 0 100%;
+                }
+            }
+            @keyframes shine {
+                0% {
+                    transform: translateX(-100%) rotate(30deg);
+                }
+                100% {
+                    transform: translateX(100%) rotate(30deg);
+                }
+            }
+            .glass-effect {
+                background: rgba(10, 25, 47, 0.7);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+            }
+            .criminal-profile-card {
+                position: relative;
+                overflow: hidden;
+            }
+            .criminal-profile-card::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: linear-gradient(0deg, transparent, #64FFDA, transparent);
+                animation: rotate 6s linear infinite;
+            }
+            .criminal-profile-card::after {
+                content: '';
+                position: absolute;
+                inset: 2px;
+                background: #0A192F;
+            }
+            @keyframes rotate {
+                0% {
+                    transform: rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+            .wanted-stamp {
+                position: relative;
+                overflow: hidden;
+                transform: rotate(-10deg);
+            }
+            .wanted-stamp::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: repeating-linear-gradient(
+                    45deg,
+                    rgba(255, 46, 99, 0.2),
+                    rgba(255, 46, 99, 0.2) 10px,
+                    rgba(255, 46, 99, 0.3) 10px,
+                    rgba(255, 46, 99, 0.3) 20px
+                );
+                opacity: 0.5;
+            }
+            .neon-border {
+                position: relative;
+            }
+            .neon-border::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                border: 1px solid transparent;
+                border-radius: inherit;
+                background: linear-gradient(90deg, #64FFDA, #0A192F, #64FFDA) border-box;
+                -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+                -webkit-mask-composite: destination-out;
+                mask-composite: exclude;
+            }
+        }
+    </style>
+</head>
+<body class="bg-primary text-light font-song min-h-screen grid-matrix">
+    <!-- 顶部导航栏 -->
+    <header class="sticky top-0 z-50 bg-dark/80 backdrop-blur-md border-b border-secondary/30">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fa fa-university text-secondary text-2xl"></i>
+                <h1 class="text-orbitron font-bold text-xl md:text-2xl tracking-wider text-secondary">K崔大本营</h1>
+            </div>
+            <nav class="hidden md:flex items-center space-x-8">
+                <a href="#" class="text-light hover:text-secondary transition-colors duration-300 font-medium">通缉令</a>
+                <a href="#" class="text-light/70 hover:text-secondary transition-colors duration-300">犯罪数据库</a>
+                <a href="#" class="text-light/70 hover:text-secondary transition-colors duration-300">宇宙安全公告</a>
+                <a href="#" class="text-light/70 hover:text-secondary transition-colors duration-300">举报系统</a>
+            </nav>
+            <div class="md:hidden">
+                <button id="mobile-menu-button" class="text-secondary">
+                    <i class="fa fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+        <!-- 移动端菜单 -->
+        <div id="mobile-menu" class="hidden md:hidden bg-dark/95 backdrop-blur-md border-b border-secondary/30">
+            <div class="container mx-auto px-4 py-3 flex flex-col space-y-4">
+                <a href="#" class="text-light hover:text-secondary transition-colors duration-300 font-medium py-2">通缉令</a>
+                <a href="#" class="text-light/70 hover:text-secondary transition-colors duration-300 py-2">犯罪数据库</a>
+                <a href="#" class="text-light/70 hover:text-secondary transition-colors duration-300 py-2">宇宙安全公告</a>
+                <a href="#" class="text-light/70 hover:text-secondary transition-colors duration-300 py-2">举报系统</a>
+                <a href="https://kordel1101.github.io/KTinfinite/" target="_blank" class="text-light/70 hover:text-secondary transition-colors duration-300 py-2 flex items-center">
+                    <i class="fa fa-external-link mr-2"></i> 跳转INFINITE主页
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 md:py-12">
+        <!-- 通缉令标题区域 -->
+        <section class="mb-12 text-center relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-b from-primary/30 to-primary"></div>
+            <div class="relative z-10">
+                <div class="inline-block mb-4 px-6 py-2 border-2 border-secondary/50 rounded-lg bg-primary/80 animate-pulse-slow">
+                    <h2 class="text-orbitron font-bold text-[clamp(1.5rem,3vw,2.5rem)] text-secondary tracking-widest">星际通缉令</h2>
+                </div>
+                <div class="inline-block px-8 py-3 border-2 border-accent/70 rounded-lg bg-dark/60 shadow-neon-red relative">
+                    <div class="absolute inset-0 bg-accent/10 animate-pulse-slow"></div>
+                    <h3 class="text-orbitron font-bold text-[clamp(2rem,5vw,3.5rem)] text-accent tracking-widest relative">极恶K</h3>
+                </div>
+                <p class="mt-6 text-lg md:text-xl text-light/80 max-w-3xl mx-auto">
+                    来自K崔大本营的最高级别通缉犯，对宇宙安全构成严重威胁。任何提供有效线索导致其被捕者，将获得<span class="text-warning font-bold">880,000k</span>k崔宇宙通用货币的巨额悬赏。
+                </p>
+            </div>
+        </section>
+
+        <!-- 主要内容区域 -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- 左侧：罪犯资料 -->
+            <section class="lg:col-span-1 space-y-8">
+                <!-- 罪犯照片和基本信息 -->
+                <div class="criminal-profile-card rounded-lg overflow-hidden relative">
+                    <div class="relative z-10 p-4">
+                        <div class="aspect-w-1 aspect-h-1 mb-4 rounded-lg overflow-hidden border-2 border-secondary/50">
+                            <img src="https://imgtu.com/uploads/uxvkkhlb/20250615015651.png" alt="极恶K照片" class="w-full h-full object-cover">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <h4 class="text-secondary text-sm uppercase tracking-wider">真实姓名</h4>
+                                <p class="text-light font-medium">Kordel Sanchez</p>
+                            </div>
+                            <div>
+                                <h4 class="text-secondary text-sm uppercase tracking-wider">别名</h4>
+                                <p class="text-light font-medium">极恶K, K1</p>
+                            </div>
+                            <div>
+                                <h4 class="text-secondary text-sm uppercase tracking-wider">身高</h4>
+                                <p class="text-light font-medium">181cm</p>
+                            </div>
+                            <div>
+                                <h4 class="text-secondary text-sm uppercase tracking-wider">来自</h4>
+                                <p class="text-light font-medium">L-578平行宇宙</p>
+                            </div>
+                            <div class="col-span-2">
+                                <h4 class="text-secondary text-sm uppercase tracking-wider">机械植入率</h4>
+                                <div class="w-full bg-dark/50 rounded-full h-2.5 mt-1">
+                                    <div class="bg-accent h-2.5 rounded-full" style="width: 65%"></div>
+                                </div>
+                                <p class="text-xs text-light/70 mt-1">65%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 物理特征 -->
+                <div class="glass-effect rounded-lg p-5 border border-secondary/30 shadow-lg">
+                    <h3 class="text-orbitron text-lg font-semibold text-secondary mb-4 flex items-center">
+                        <i class="fa fa-user-secret mr-2"></i> 物理特征
+                    </h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <i class="fa fa-circle text-xs text-secondary mt-1.5 mr-2"></i>
+                            <span>比普通的k高6cm，更瘦削，看上去25岁</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-circle text-xs text-secondary mt-1.5 mr-2"></i>
+                            <span>右眼戴黑色机械眼罩，内置传感器，科技树相当于0.73个反骨k</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-circle text-xs text-secondary mt-1.5 mr-2"></i>
+                            <span>不喜欢打领带，衬衫扣子经常扣错，生活习惯邋遢</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-circle text-xs text-secondary mt-1.5 mr-2"></i>
+                            <span>全宇宙最不会微笑的k</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-circle text-xs text-secondary mt-1.5 mr-2"></i>
+                            <span>酒味很重，喜欢喝红葡萄酒和白葡萄酒</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- 性格特征 -->
+                <div class="glass-effect rounded-lg p-5 border border-secondary/30 shadow-lg">
+                    <h3 class="text-orbitron text-lg font-semibold text-secondary mb-4 flex items-center">
+                        <i class="fa fa-id-card-o mr-2"></i> 性格特征
+                    </h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-dark/50 rounded p-3 border border-secondary/20">
+                            <h4 class="text-xs text-secondary uppercase tracking-wider mb-1">MBTI</h4>
+                            <p class="text-light font-medium">ISFJ</p>
+                        </div>
+                        <div class="bg-dark/50 rounded p-3 border border-secondary/20">
+                            <h4 class="text-xs text-secondary uppercase tracking-wider mb-1">道德倾向</h4>
+                            <p class="text-light font-medium">混乱邪恶</p>
+                        </div>
+                        <div class="col-span-2 bg-dark/50 rounded p-3 border border-secondary/20">
+                            <h4 class="text-xs text-secondary uppercase tracking-wider mb-1">危险评估</h4>
+                            <div class="flex justify-between items-center">
+                                <span class="text-light font-medium">极高</span>
+                                <div class="flex space-x-1">
+                                    <i class="fa fa-exclamation-circle text-accent"></i>
+                                    <i class="fa fa-exclamation-circle text-accent"></i>
+                                    <i class="fa fa-exclamation-circle text-accent"></i>
+                                    <i class="fa fa-exclamation-circle text-accent"></i>
+                                    <i class="fa fa-exclamation-circle text-accent"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <p class="text-light/80 text-sm">
+                            表面冷静温柔，实际上极度扭曲，自恋且恶劣。由于"湮灭装置"的侵蚀，导致其精神状态极不稳定，喜怒无常。拥有极高智商和极强记忆力，善于操纵和折磨他人，尤其是对认知层面的摧残尤为擅长。
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 技术支持与肖像提供者 -->
+                <div class="glass-effect rounded-lg p-5 border border-secondary/30 shadow-lg">
+                    <h3 class="text-orbitron text-lg font-semibold text-secondary mb-4">技术支持与肖像</h3>
+                    <div class="flex flex-col md:flex-row items-center">
+                        <div class="md:w-2/3 mb-4 md:mb-0 md:pr-4">
+                            <p class="text-light/70 text-sm">
+                                技术支持由原初k提供<br>
+                                嫌疑人肖像由原初崔提供<br>
+                                请保护他们
+                            </p>
+                        </div>
+                        <div class="md:w-1/3">
+                            <div class="bg-dark/60 rounded-lg overflow-hidden border border-secondary/30">
+                                <img src="https://imgtu.com/uploads/uyroczei/20250615021622.jpg" alt="原初k" class="w-full h-auto object-cover aspect-[1/2]">
+                                <p class="text-light/70 text-xs italic p-2 text-center">这是原初k</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 右侧：犯罪记录和相关信息 -->
+            <section class="lg:col-span-2 space-y-8">
+                <!-- 犯罪记录 -->
+                <div class="glass-effect rounded-lg p-5 border border-secondary/30 shadow-lg">
+                    <h3 class="text-orbitron text-xl font-semibold text-secondary mb-6 flex items-center">
+                        <i class="fa fa-list-alt mr-2"></i> 主要犯罪记录
+                    </h3>
+                    <div class="space-y-6">
+                        <div class="bg-dark/40 rounded-lg p-4 border border-danger/30 hover:border-danger/60 transition-all duration-300">
+                            <div class="flex justify-between items-center mb-3">
+                                <h4 class="text-light font-bold text-lg">折磨并改造L-578平行宇宙的Trista</h4>
+                                <span class="px-3 py-1 bg-danger/20 text-danger text-xs rounded-full">S级罪行</span>
+                            </div>
+                            <p class="text-light/80 text-sm mb-3">
+                                长期折磨L-578平行宇宙的Trista（并且其未成年），强迫其接受非人道的机械改造，安装"不死装置"，以观察其精神极限和复活能力。导致Trista身心遭受极大创伤，成为危险人物Boss崔。
+                            </p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-light/60 text-xs">2024年10月17日</span>
+                                <button class="text-secondary text-xs hover:underline flex items-center">
+                                    查看详情 <i class="fa fa-angle-right ml-1"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="bg-dark/40 rounded-lg p-4 border border-danger/30 hover:border-danger/60 transition-all duration-300">
+                            <div class="flex justify-between items-center mb-3">
+                                <h4 class="text-light font-bold text-lg">平行宇宙维度轰炸</h4>
+                                <span class="px-3 py-1 bg-danger/20 text-danger text-xs rounded-full">A级罪行</span>
+                            </div>
+                            <p class="text-light/80 text-sm mb-3">
+                                酗酒，导致炸弹装置事故，对L-578星系团中的12个宜居星球进行无差别轰炸，导致超过30亿无辜生命死亡，生态系统永久破坏。
+                            </p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-light/60 text-xs">2025年3月15日</span>
+                                <button class="text-secondary text-xs hover:underline flex items-center">
+                                    查看详情 <i class="fa fa-angle-right ml-1"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="bg-dark/40 rounded-lg p-4 border border-danger/30 hover:border-danger/60 transition-all duration-300">
+                            <div class="flex justify-between items-center mb-3">
+                                <h4 class="text-light font-bold text-lg">宇宙监狱破坏与重犯释放</h4>
+                                <span class="px-3 py-1 bg-danger/20 text-danger text-xs rounded-full">A级罪行</span>
+                            </div>
+                            <p class="text-light/80 text-sm mb-3">
+                                刑满释放获得工作，在工位酗酒，出现事故破坏了核心观测系统，间接导致银河系边缘星域陷入混乱。
+                            </p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-light/60 text-xs">2025年2月28日</span>
+                                <button class="text-secondary text-xs hover:underline flex items-center">
+                                    查看详情 <i class="fa fa-angle-right ml-1"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="bg-dark/40 rounded-lg p-4 border border-danger/30 hover:border-danger/60 transition-all duration-300">
+                            <div class="flex justify-between items-center mb-3">
+                                <h4 class="text-light font-bold text-lg">心智控制实验</h4>
+                                <span class="px-3 py-1 bg-danger/20 text-danger text-xs rounded-full">SS级罪行</span>
+                            </div>
+                            <p class="text-light/80 text-sm mb-3">
+                                否认自己对L-578Trista的罪行，并将其抓回住处继续折磨，与H-83主线k可能有关系
+                            </p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-light/60 text-xs">2025年1月12日</span>
+                                <button class="text-secondary text-xs hover:underline flex items-center">
+                                    查看详情 <i class="fa fa-angle-right ml-1"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="bg-dark/40 rounded-lg p-4 border border-danger/30 hover:border-danger/60 transition-all duration-300">
+                            <div class="flex justify-between items-center mb-3">
+                                <h4 class="text-light font-bold text-lg">星际贸易路线劫持</h4>
+                                <span class="px-3 py-1 bg-danger/20 text-danger text-xs rounded-full">S级罪行</span>
+                            </div>
+                            <p class="text-light/80 text-sm mb-3">
+                                在跨宇宙飞船内抽满级科技树的宇宙烟，导致飞船撞向连接阿尔法象限和贝塔象限的主要贸易路线，超过200艘民用和商用飞船无法准点到达目的地，造成经济损失超过1000亿星际信用点。
+                            </p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-light/60 text-xs">2024年12月5日</span>
+                                <button class="text-secondary text-xs hover:underline flex items-center">
+                                    查看详情 <i class="fa fa-angle-right ml-1"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-6 text-center">
+                        <button class="px-4 py-2 bg-secondary/20 hover:bg-secondary/30 text-secondary rounded-lg transition-all duration-300 flex items-center mx-auto">
+                            查看全部891项罪行 <i class="fa fa-chevron-down ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 悬赏信息 -->
+                <div class="glass-effect rounded-lg p-5 border border-warning/50 shadow-neon relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-warning/10 rounded-full filter blur-xl"></div>
+                    <div class="absolute bottom-0 left-0 w-32 h-32 bg-warning/10 rounded-full filter blur-xl"></div>
+                    <div class="relative z-10">
+                        <h3 class="text-orbitron text-xl font-semibold text-warning mb-6 flex items-center">
+                            <i class="fa fa-diamond mr-2"></i> 悬赏信息
+                        </h3>
+                        <div class="text-center mb-6">
+                            <div class="inline-block p-4 bg-dark/60 rounded-full border-2 border-warning/70 shadow-neon">
+                                <p class="text-warning text-4xl font-bold tracking-wider">880,000 k崔通用货币</p>
+                                <p class="text-light/70 text-xs">星际信用点</p>
+                            </div>
+                        </div>
+                        <p class="text-light/80 mb-6 text-center">
+                            提供有效线索导致极恶K被捕者将获得上述悬赏。信息经核实后立即支付。<br>
+                            窝藏或协助逃犯将被判处最高监禁200年及没收全部资产。
+                        </p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="bg-dark/40 rounded-lg p-4 border border-secondary/20 text-center">
+                                <div class="text-secondary text-2xl mb-2">
+                                    <i class="fa fa-phone"></i>
+                                </div>
+                                <h4 class="text-light font-medium mb-1">电话举报</h4>
+                                <p class="text-light/70 text-sm">+01-800-KTRAPPER</p>
+                            </div>
+                            <div class="bg-dark/40 rounded-lg p-4 border border-secondary/20 text-center">
+                                <div class="text-secondary text-2xl mb-2">
+                                    <i class="fa fa-envelope-o"></i>
+                                </div>
+                                <h4 class="text-light font-medium mb-1">邮件举报</h4>
+                                <p class="text-light/70 text-sm">wanted@ktrappercamp.com</p>
+                            </div>
+                            <div class="bg-dark/40 rounded-lg p-4 border border-secondary/20 text-center">
+                                <div class="text-secondary text-2xl mb-2">
+                                    <i class="fa fa-map-marker"></i>
+                                </div>
+                                <h4 class="text-light font-medium mb-1">线下举报站</h4>
+                                <p class="text-light/70 text-sm">各星系K崔安全局</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 讽刺诗 -->
+                <div class="glass-effect rounded-lg p-5 border border-accent/50 shadow-neon-red relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-accent/10 rounded-full filter blur-xl"></div>
+                    <div class="absolute bottom-0 left-0 w-32 h-32 bg-accent/10 rounded-full filter blur-xl"></div>
+                    <div class="relative z-10">
+                        <h3 class="text-orbitron text-xl font-semibold text-accent mb-6 flex items-center">
+                            <i class="fa fa-pencil-square-o mr-2"></i> 关于极恶K的讽刺诗
+                        </h3>
+                        <div class="bg-dark/60 rounded-lg p-6 border border-accent/30">
+                            <p class="text-light/90 italic mb-4">作者：原初崔</p>
+                            <pre class="text-light/80 leading-relaxed">
+饮酒过度失足摔下三层楼
+两脚一蹬袜子颜色不一样
+一觉醒来衬衫扣子全扣错
+没拿衣服洗澡出来到处找
+报出身份喜提宇宙追杀令
+                            </pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- 目击地点提交区域 -->
+        <section class="mt-12 glass-effect rounded-lg p-6 border border-secondary/30 shadow-lg">
+            <h3 class="text-orbitron text-xl font-semibold text-secondary mb-6 flex items-center">
+                <i class="fa fa-map-o mr-2"></i> 提交目击地点
+            </h3>
+            <p class="text-light/80 mb-6">
+                如果您在任何地点目击到极恶K的行踪，请立即提交以下表单。您的信息将被严格保密，一旦核实将立即支付悬赏。
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <div class="mb-4">
+                        <label for="location" class="block text-secondary text-sm font-medium mb-2">目击地点</label>
+                        <input type="text" id="location" class="w-full bg-dark/60 border border-secondary/30 rounded-lg px-4 py-2 text-light focus:outline-none focus:border-secondary" placeholder="请输入星系坐标或星球名称" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="date" class="block text-secondary text-sm font-medium mb-2">目击日期</label>
+                        <input type="date" id="date" class="w-full bg-dark/60 border border-secondary/30 rounded-lg px-4 py-2 text-light focus:outline-none focus:border-secondary" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="time" class="block text-secondary text-sm font-medium mb-2">目击时间</label>
+                        <input type="time" id="time" class="w-full bg-dark/60 border border-secondary/30 rounded-lg px-4 py-2 text-light focus:outline-none focus:border-secondary" required>
+                    </div>
+                </div>
+                <div>
+                    <div class="mb-4">
+                        <label for="description" class="block text-secondary text-sm font-medium mb-2">详细描述</label>
+                        <textarea id="description" rows="5" class="w-full bg-dark/60 border border-secondary/30 rounded-lg px-4 py-2 text-light focus:outline-none focus:border-secondary" placeholder="请描述极恶K的行为、外貌特征、同行人员等信息" required></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label for="evidence" class="block text-secondary text-sm font-medium mb-2">证据上传（可选）</label>
+                        <input type="file" id="evidence" class="w-full bg-dark/60 border border-secondary/30 rounded-lg px-4 py-2 text-light focus:outline-none focus:border-secondary" accept="image/*,video/*">
+                        <p class="text-light/60 text-xs mt-1">支持图片或视频格式</p>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-6 flex items-center">
+                <input type="checkbox" id="anonymous" class="mr-2 bg-dark/60 border border-secondary/30 rounded">
+                <label for="anonymous" class="text-light/80 text-sm">匿名提交</label>
+            </div>
+            <div class="mt-6">
+                <button id="submit-sighting" class="px-6 py-3 bg-accent hover:bg-accent/80 text-white rounded-lg transition-all duration-300 flex items-center shadow-neon-red">
+                    <i class="fa fa-paper-plane mr-2"></i> 提交目击报告
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark/80 border-t border-secondary/30 mt-16">
+        <div class="container mx-auto px-4 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <i class="fa fa-university text-secondary text-2xl"></i>
+                        <h2 class="text-orbitron font-bold text-xl tracking-wider text-secondary">K崔大本营</h2>
+                    </div>
+                    <p class="text-light/70 text-sm">
+                        K崔大本营致力于维护宇宙和平与安全，打击跨星系犯罪活动，保护各文明的生存与发展。
+                    </p>
+                </div>
+                <div>
+                    <h3 class="text-secondary font-semibold mb-4">快速链接</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-light/70 hover:text-secondary transition-colors duration-300 text-sm">通缉数据库</a></li>
+                        <li><a href="#" class="text-light/70 hover:text-secondary transition-colors duration-300 text-sm">安全公告</a></li>
+                        <li><a href="#" class="text-light/70 hover:text-secondary transition-colors duration-300 text-sm">星际法律</a></li>
+                        <li><a href="#" class="text-light/70 hover:text-secondary transition-colors duration-300 text-sm">关于我们</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-secondary font-semibold mb-4">联系方式</h3>
+                    <ul class="space-y-2">
+                        <p> 电话：KT-01-110
+
+                        </p>
+                        <li class="flex items-center text-sm">
+                            <i class="fa fa-map-marker text-secondary mr-2"></i>
+                            <span class="text-light/70">银河中心区K崔大厦</span>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-secondary font-semibold mb-4">关注我们</h3>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-8 h-8 rounded-full bg-dark border border-secondary/30 flex items-center justify-center text-secondary hover:bg-secondary hover:text-primary transition-all duration-300">
+                            <i class="fa fa-globe"></i>
+                        </a>
+                        <a href="#" class="w-8 h-8 rounded-full bg-dark border border-secondary/30 flex items-center justify-center text-secondary hover:bg-secondary hover:text-primary transition-all duration-300">
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                        <a href="#" class="w-8 h-8 rounded-full bg-dark border border-secondary/30 flex items-center justify-center text-secondary hover:bg-secondary hover:text-primary transition-all duration-300">
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                        <a href="#" class="w-8 h-8 rounded-full bg-dark border border-secondary/30 flex items-center justify-center text-secondary hover:bg-secondary hover:text-primary transition-all duration-300">
+                            <i class="fa fa-instagram"></i>
+                        </a>
+                    </div>
+                    <p class="text-light/70 text-sm mt-4">
+                        订阅我们的安全简报，获取最新通缉信息和宇宙安全动态。
+                    </p>
+                    <div class="mt-2 flex">
+                        <input type="email" placeholder="你的邮箱地址" class="bg-dark border border-secondary/30 rounded-l-lg px-3 py-1 text-sm w-full focus:outline-none focus:border-secondary">
+                        <button class="bg-secondary text-primary px-3 py-1 rounded-r-lg text-sm hover:bg-secondary/80 transition-colors duration-300">
+                            订阅
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-secondary/20 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-light/50 text-sm">
+                    &copy; 2025 K崔大本营. 保留所有权利.
+                </p>
+                <div class="flex space-x-4 mt-4 md:mt-0">
+                    <a href="#" class="text-light/50 hover:text-secondary transition-colors duration-300 text-sm">隐私政策</a>
+                    <a href="#" class="text-light/50 hover:text-secondary transition-colors duration-300 text-sm">使用条款</a>
+                    <a href="#" class="text-light/50 hover:text-secondary transition-colors duration-300 text-sm">Cookie政策</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 举报悬浮按钮 -->
+    <div class="fixed bottom-6 right-6 z-40">
+        <button class="w-14 h-14 rounded-full bg-accent text-white shadow-neon-red flex items-center justify-center animate-pulse-slow hover:bg-accent/80 transition-all duration-300">
+            <i class="fa fa-exclamation-triangle text-xl"></i>
+        </button>
+    </div>
+
+    <!-- 跳转INFINITE主页按钮 -->
+    <div class="fixed bottom-6 left-6 z-40">
+        <button id="infinite-button" class="w-14 h-14 rounded-full bg-secondary text-primary shadow-neon flex items-center justify-center hover:bg-secondary/80 transition-all duration-300">
+            <i class="fa fa-external-link text-xl"></i>
+        </button>
+    </div>
+
+    <!-- 提交成功弹窗 -->
+    <div id="success-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+        <div class="relative bg-primary border border-secondary/50 rounded-lg p-6 max-w-md w-full shadow-neon">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-success/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fa fa-check text-success text-2xl"></i>
+                </div>
+                <h3 class="text-orbitron text-xl font-semibold text-light mb-2">提交成功</h3>
+                <p class="text-light/80 mb-6">
+                    感谢您提供的信息，我们的特工将立即前往调查。一旦核实，您将获得相应的悬赏奖励。
+                </p>
+                <button id="close-modal" class="px-6 py-2 bg-secondary text-primary rounded-lg hover:bg-secondary/80 transition-all duration-300">
+                    确定
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 脚本 -->
+    <script>
+        // 移动端菜单切换
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // 滚动动画效果
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // 提交目击报告
+        document.getElementById('submit-sighting').addEventListener('click', function() {
+            // 验证表单
+            const location = document.getElementById('location').value;
+            const date = document.getElementById('date').value;
+            const time = document.getElementById('time').value;
+            const description = document.getElementById('description').value;
+            
+            if (!location || !date || !time || !description) {
+                alert('请填写所有必填字段');
+                return;
+            }
+            
+            // 显示成功弹窗
+            document.getElementById('success-modal').classList.remove('hidden');
+            
+            // 清空表单
+            document.getElementById('location').value = '';
+            document.getElementById('date').value = '';
+            document.getElementById('time').value = '';
+            document.getElementById('description').value = '';
+            document.getElementById('evidence').value = '';
+            document.getElementById('anonymous').checked = false;
+        });
+
+        // 关闭弹窗
+        document.getElementById('close-modal').addEventListener('click', function() {
+            document.getElementById('success-modal').classList.add('hidden');
+        });
+
+        // 点击遮罩层关闭弹窗
+        document.getElementById('success-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                document.getElementById('success-modal').classList.add('hidden');
+            }
+        });
+
+        // 跳转INFINITE主页
+        document.getElementById('infinite-button').addEventListener('click', function() {
+            window.open('https://kordel1101.github.io/KTinfinite/', '_blank');
+        });
+    </script>
+</body>
+</html>    
